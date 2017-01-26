@@ -1,0 +1,36 @@
+Posts
++-----------+---------------+------+-----+---------+----------------+
+| Field     | Type          | Null | Key | Default | Extra          |
++-----------+---------------+------+-----+---------+----------------+
+| id        | int(11)       | NO   | PRI | NULL    | auto_increment |
+| title     | varchar(300)  | YES  |     | NULL    |                |
+| url       | varchar(2000) | YES  |     | NULL    |                |
+| userId    | int(11)       | YES  | MUL | NULL    |                |
+| createdAt | datetime      | NO   |     | NULL    |                |
+| updatedAt | datetime      | NO   |     | NULL    |                |
++-----------+---------------+------+-----+---------+----------------+
+
+Users
++-----------+-------------+------+-----+---------+----------------+
+| Field     | Type        | Null | Key | Default | Extra          |
++-----------+-------------+------+-----+---------+----------------+
+| id        | int(11)     | NO   | PRI | NULL    | auto_increment |
+| username  | varchar(50) | NO   | UNI | NULL    |                |
+| password  | varchar(60) | NO   |     | NULL    |                |
+| createdAt | datetime    | NO   |     | NULL    |                |
+| updatedAt | datetime    | NO   |     | NULL    |                |
++-----------+-------------+------+-----+---------+----------------+
+
+SELECT posts.id,
+posts.title,
+posts.url,
+posts.createdAt as posts_CreatedAt,
+posts.updatedAt as posts_UpdatedAt,
+users.id,
+users.username,
+users.password,
+users.createdAt as users_CreatedAt,
+users.updatedAt as users_UpdatedAt
+FROM posts 
+LEFT JOIN users 
+ON userid = users.id

@@ -3,9 +3,9 @@ var mysql = require('mysql');
 
 // create a connection to our Cloud9 server
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'ziad_saab', // CHANGE THIS :)
-  password : '',
+  host: 'localhost',
+  user: 'allendecodemtl', // CHANGE THIS :)
+  password: '',
   database: 'reddit'
 });
 
@@ -27,12 +27,14 @@ redditAPI.createUser({
       url: 'https://www.reddit.com',
       userId: user.id
     }, function(err, post) {
+      
       if (err) {
         console.log(err);
       }
       else {
         console.log(post);
       }
+      
     });
   }
 });

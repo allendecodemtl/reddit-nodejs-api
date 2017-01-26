@@ -137,40 +137,90 @@ function getAllPostsForUSer(userId, options, conn) {
     var promOne = conn.query(queryStr, [userId, limit, offset]);
 
     return promOne
-        .then(function(result) {
+    .then(function(result) {
 
-            //console.log(result);
-            var arrResult = []
+        //console.log(result);
+        var arrResult = []
 
-            result.forEach(function(item, index) {
+        result.forEach(function(item, index) {
 
-                var temp = {
-                    id: item.postId,
-                    title: item.title,
-                    url: item.url,
-                    createdAt: item.posts_CreatedAt,
-                    updatedAt: item.posts_UpdatedAt,
-                    userId: item.usersId,
-                    user: {
-                        id: item.usersId,
-                        username: item.username,
-                        createdAt: item.users_CreatedAt,
-                        updatedAt: item.users_UpdatedAt
-                    }
-
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
                 }
-
-                arrResult.push(temp);
-            })
-
-
-            return arrResult;
-
+            }
+            arrResult.push(temp);
         })
-        .catch(function(err) {
-            throw err;
-        })
+        return arrResult;
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
+
+
+function getSinglePost(userId, conn) {
+
+    var queryStr = `
+        SELECT posts.id as postId,
+        posts.title,
+        posts.url,
+        posts.createdAt as posts_CreatedAt,
+        posts.updatedAt as posts_UpdatedAt,
+        users.id as usersId,
+        users.username,
+        users.password,
+        users.createdAt as users_CreatedAt,
+        users.updatedAt as users_UpdatedAt
+        FROM posts 
+        JOIN users 
+        ON posts.userid = users.id
+        WHERE posts.id = ?
+        ORDER BY posts.createdAt DESC
+    `;
+
+    var promOne = conn.query(queryStr, [userId]);
+
+    return promOne
+    .then(function(result) {
+
+        //console.log(result);
+        var arrResult = []
+
+        result.forEach(function(item, index) {
+
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
+                }
+            }
+            arrResult.push(temp);
+        })
+        return arrResult;
+    })
+    .catch(function(err) {
+        throw err;
+    })
+}
+
 
 
 
@@ -180,6 +230,7 @@ module.exports = {
     getAllPosts: getAllPosts,
     createUser: createUser,
     createPost: createPost,
-    getAllPostsForUSer:getAllPostsForUSer
+    getAllPostsForUSer: getAllPostsForUSer,
+    getSinglePost: getSinglePost
 
 };

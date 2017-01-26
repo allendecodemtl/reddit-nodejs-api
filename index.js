@@ -11,13 +11,8 @@ var connection = mysql.createPool({
 // load our API and pass it the connection
 var redditAPI = require('./reddit_promise');
 
-redditAPI.getAllPostsForUSer(1,{},connection)
-.then(function(res) {
-    console.log(res);
-})
-.catch(function(err) {
-    console.log(err);
-})
+
+
 
 
 // redditAPI.createUser({
@@ -47,4 +42,32 @@ redditAPI.getAllPostsForUSer(1,{},connection)
 //     console.log(err);
 //     //connection.end();
 // })
+
+
+// redditAPI.getAllPosts({},connection)
+// .then(function(res) {
+//     console.log(res);
+// })
+// .catch(function(err) {
+//     console.log(err);
+// })
+
+
+// redditAPI.getAllPostsForUSer(1,{},connection)
+// .then(function(res) {
+//     console.log(res);
+// })
+// .catch(function(err) {
+//     console.log(err);
+// })
+
+
+// redditAPI.getSinglePost(3,connection)
+// .then(function(res) {
+//     console.log(res);
+// })
+// .catch(function(err) {
+//     console.log(err);
+// })
+
 

@@ -14,7 +14,6 @@ var redditAPI = require('./reddit_promise');
 
 
 
-
 // redditAPI.createUser({
 //   username: 'hello67',
 //   password: 'xxx'
@@ -31,9 +30,10 @@ var redditAPI = require('./reddit_promise');
 
 // redditAPI.createPost({
 //       title: 'hi reddit!',
-//       url: 'https://www.reddit/r/funny',
-//       userId: 3
-//     },connection)
+//       url: 'https://www.reddit/r/funny/xxxx/x/xxx',
+//       userId: 4 //,
+//       //subredditId: 1
+//     }, 2, connection)
 // .then(function(res) {
 //     console.log(res);
 //     //connection.end();
@@ -70,4 +70,42 @@ var redditAPI = require('./reddit_promise');
 //     console.log(err);
 // })
 
+
+
+// redditAPI.createSubreddit({
+//   name: '/r/cars',
+//   description: 'cars'
+// },connection)
+// .then(function(res) {
+//     console.log(res);
+//     //connection.end();
+// })
+// .catch(function(err) {
+//     console.log(err);
+//     //connection.end();
+// })
+
+
+// redditAPI.getAllSubreddits(connection)
+// .then(function(res) {
+//     console.log(res);
+// })
+// .catch(function(err) {
+//     console.log(err);
+// })
+
+
+// redditAPI.createOrUpdateVote({
+//         userId: 1,
+//         postId: 1,
+//         vote: 0
+//     }, connection)
+// .then(function(res) {
+//     console.log(res);
+//     //connection.end();
+// })
+// .catch(function(err) {
+//     console.log(err);
+//     //connection.end();
+// })
 

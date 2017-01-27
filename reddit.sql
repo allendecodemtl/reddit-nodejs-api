@@ -32,5 +32,25 @@ CREATE TABLE `subreddits` (
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`), 
+  UNIQUE KEY `name` (`name`)
 );
+
+
+ALTER TABLE posts
+ADD subredditId int(11),
+ADD FOREIGN KEY (subredditId) REFERENCES subreddits(id) ON DELETE SET NULL;
+
+
+        
+CREATE TABLE `votes` (
+  `postId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `vote` TINYINT NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL,
+  PRIMARY KEY (userId, postId),
+  FOREIGN KEY (`postId`) REFERENCES `subreddits` (`id`),
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`) 
+);        
+
+

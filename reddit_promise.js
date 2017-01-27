@@ -31,20 +31,19 @@ function createUser(user, conn) {
 }
 
 
-function createPost(post, conn) {
+function createPost(post, sub, conn) {
 
     return conn.query(
-            'INSERT INTO posts (userId, title, url, createdAt) VALUES (?, ?, ?, ?)', [post.userId, post.title, post.url, new Date()])
+            'INSERT INTO posts (userId, title, url, createdAt, subredditId) VALUES (?, ?, ?, ?, ?)', [post.userId, post.title, post.url, new Date(), sub])
         .then(function(result) {
 
             return conn.query(
-                'SELECT id,title,url,userId, createdAt, updatedAt FROM posts WHERE id = ?', [result.insertId]);
+                'SELECT id,title,url,userId, createdAt, updatedAt, subredditId FROM posts WHERE id = ?', [result.insertId]);
         })
         .then(function(result) {
 
             return result;
-        });
-
+        })
 }
 
 
@@ -63,10 +62,15 @@ function getAllPosts(options, conn) {
         users.username,
         users.password,
         users.createdAt as users_CreatedAt,
-        users.updatedAt as users_UpdatedAt
+        users.updatedAt as users_UpdatedAt,
+        subreddits.id as subredditId,
+        subreddits.name,
+        subreddits.description
         FROM posts 
         LEFT JOIN users 
         ON posts.userid = users.id
+        LEFT JOIN subreddits
+        ON posts.subredditId = subreddits.id
         ORDER BY posts.createdAt DESC
         LIMIT ? OFFSET ?
     `;
@@ -76,8 +80,7 @@ function getAllPosts(options, conn) {
     return promOne
         .then(function(result) {
 
-            //console.log(result);
-            var arrResult = []
+            var arrResult = [];
 
             result.forEach(function(item, index) {
 
@@ -93,6 +96,11 @@ function getAllPosts(options, conn) {
                         username: item.username,
                         createdAt: item.users_CreatedAt,
                         updatedAt: item.users_UpdatedAt
+                    },
+                    subreddit: {
+                        id: item.subredditId,
+                        name: item.name,
+                        description: item.description
                     }
 
                 }
@@ -182,7 +190,7 @@ function getSinglePost(userId, conn) {
         users.createdAt as users_CreatedAt,
         users.updatedAt as users_UpdatedAt
         FROM posts 
-        JOIN users 
+        LEFT JOIN users 
         ON posts.userid = users.id
         WHERE posts.id = ?
         ORDER BY posts.createdAt DESC
@@ -222,6 +230,61 @@ function getSinglePost(userId, conn) {
 }
 
 
+function createSubreddit(sub, conn) {
+
+    return conn.query(
+            'INSERT INTO subreddits (name, description, createdAt) VALUES (?, ?, ?)', [sub.name, sub.description, new Date()])
+        .then(function(result) {
+
+            return conn.query(
+                'SELECT id, name, description, createdAt, updatedAt FROM subreddits WHERE id = ?', [result.insertId]);
+        })
+        .then(function(result) {
+
+            return result;
+        });
+
+}
+
+
+function getAllSubreddits(conn) {
+
+   
+    var queryStr = `
+        SELECT id, name, description, createdAt, updatedAt
+        FROM subreddits 
+        ORDER BY createdAt DESC
+    `;
+
+    var promOne = conn.query(queryStr);
+
+    return promOne
+        .then(function(result) {
+            return result;
+
+        })
+        .catch(function(err) {
+            throw err;
+        })
+}
+
+
+
+function createOrUpdateVote(vote, conn) {
+
+    return conn.query(
+            'INSERT INTO votes SET postId=?, userId=?, vote=? ON DUPLICATE KEY UPDATE vote=?', [vote.postId, vote.userId, vote.vote, vote.vote])
+        .then(function(result) {
+            console.log(result);
+            return conn.query(
+                'SELECT postId, userId, vote, createdAt, updatedAt FROM votes');
+        })
+        .then(function(result) {
+
+            return result;
+        });
+
+}
 
 
 // Export the API
@@ -231,6 +294,9 @@ module.exports = {
     createUser: createUser,
     createPost: createPost,
     getAllPostsForUSer: getAllPostsForUSer,
-    getSinglePost: getSinglePost
+    getSinglePost: getSinglePost,
+    createSubreddit: createSubreddit,
+    getAllSubreddits: getAllSubreddits,
+    createOrUpdateVote: createOrUpdateVote
 
 };

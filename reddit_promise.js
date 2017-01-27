@@ -118,7 +118,7 @@ function getAllPosts(options, conn) {
 }
 
 
-function getAllPostsForUSer(userId, options, conn) {
+function getAllPostsForUser(userId, options, conn) {
 
     var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
     var offset = (options.page || 0) * limit;
@@ -249,7 +249,6 @@ function createSubreddit(sub, conn) {
 
 function getAllSubreddits(conn) {
 
-   
     var queryStr = `
         SELECT id, name, description, createdAt, updatedAt
         FROM subreddits 
@@ -293,7 +292,7 @@ module.exports = {
     getAllPosts: getAllPosts,
     createUser: createUser,
     createPost: createPost,
-    getAllPostsForUSer: getAllPostsForUSer,
+    getAllPostsForUser: getAllPostsForUser,
     getSinglePost: getSinglePost,
     createSubreddit: createSubreddit,
     getAllSubreddits: getAllSubreddits,

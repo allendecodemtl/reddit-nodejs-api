@@ -13,7 +13,6 @@ var redditAPI = require('./reddit_promise');
 
 
 
-
 // redditAPI.createUser({
 //   username: 'hello67',
 //   password: 'xxx'
@@ -53,7 +52,7 @@ var redditAPI = require('./reddit_promise');
 // })
 
 
-// redditAPI.getAllPostsForUSer(1,{},connection)
+// redditAPI.getAllPostsForUser(1,{},connection)
 // .then(function(res) {
 //     console.log(res);
 // })
@@ -108,4 +107,6 @@ var redditAPI = require('./reddit_promise');
 //     console.log(err);
 //     //connection.end();
 // })
+
+
 

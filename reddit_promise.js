@@ -4,46 +4,46 @@ var HASH_ROUNDS = 10;
 function createUser(user, conn) {
 
     return bcrypt.hash(user.password, HASH_ROUNDS)
-        .then(function(hashedPassword) {
+    .then(function(hashedPassword) {
 
-            return conn.query(
-                'INSERT INTO users (username,password, createdAt) VALUES (?, ?, ?)', [user.username, hashedPassword, new Date()]);
+        return conn.query(
+            'INSERT INTO users (username,password, createdAt) VALUES (?, ?, ?)', [user.username, hashedPassword, new Date()]);
 
-        })
-        .then(function(results) {
+    })
+    .then(function(results) {
 
-            return conn.query(
-                'SELECT id, username, createdAt, updatedAt FROM users WHERE id = ?', [results.insertId]);
+        return conn.query(
+            'SELECT id, username, createdAt, updatedAt FROM users WHERE id = ?', [results.insertId]);
 
-        })
-        .then(function(result) {
-            return result;
+    })
+    .then(function(result) {
+        return result;
 
-        })
-        .catch(function(err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-                throw (new Error('A user with this username already exists'));
-            }
-            else {
-                return (err);
-            }
-        });
+    })
+    .catch(function(err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            throw (new Error('A user with this username already exists'));
+        }
+        else {
+            return (err);
+        }
+    });
 }
 
 
 function createPost(post, sub, conn) {
 
     return conn.query(
-            'INSERT INTO posts (userId, title, url, createdAt, subredditId) VALUES (?, ?, ?, ?, ?)', [post.userId, post.title, post.url, new Date(), sub])
-        .then(function(result) {
+        'INSERT INTO posts (userId, title, url, createdAt, subredditId) VALUES (?, ?, ?, ?, ?)', [post.userId, post.title, post.url, new Date(), sub])
+    .then(function(result) {
 
-            return conn.query(
-                'SELECT id,title,url,userId, createdAt, updatedAt, subredditId FROM posts WHERE id = ?', [result.insertId]);
-        })
-        .then(function(result) {
+        return conn.query(
+            'SELECT id,title,url,userId, createdAt, updatedAt, subredditId FROM posts WHERE id = ?', [result.insertId]);
+    })
+    .then(function(result) {
 
-            return result;
-        })
+        return result;
+    })
 }
 
 
@@ -78,43 +78,43 @@ function getAllPosts(options, conn) {
     var promOne = conn.query(queryStr, [limit, offset]);
 
     return promOne
-        .then(function(result) {
+    .then(function(result) {
 
-            var arrResult = [];
+        var arrResult = [];
 
-            result.forEach(function(item, index) {
+        result.forEach(function(item, index) {
 
-                var temp = {
-                    id: item.postId,
-                    title: item.title,
-                    url: item.url,
-                    createdAt: item.posts_CreatedAt,
-                    updatedAt: item.posts_UpdatedAt,
-                    userId: item.usersId,
-                    user: {
-                        id: item.usersId,
-                        username: item.username,
-                        createdAt: item.users_CreatedAt,
-                        updatedAt: item.users_UpdatedAt
-                    },
-                    subreddit: {
-                        id: item.subredditId,
-                        name: item.name,
-                        description: item.description
-                    }
-
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
+                },
+                subreddit: {
+                    id: item.subredditId,
+                    name: item.name,
+                    description: item.description
                 }
 
-                arrResult.push(temp);
-            })
+            }
 
-
-            return arrResult;
-
+            arrResult.push(temp);
         })
-        .catch(function(err) {
-            throw err;
-        })
+
+
+        return arrResult;
+
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
 
 
@@ -233,16 +233,16 @@ function getSinglePost(userId, conn) {
 function createSubreddit(sub, conn) {
 
     return conn.query(
-            'INSERT INTO subreddits (name, description, createdAt) VALUES (?, ?, ?)', [sub.name, sub.description, new Date()])
-        .then(function(result) {
+        'INSERT INTO subreddits (name, description, createdAt) VALUES (?, ?, ?)', [sub.name, sub.description, new Date()])
+    .then(function(result) {
 
-            return conn.query(
-                'SELECT id, name, description, createdAt, updatedAt FROM subreddits WHERE id = ?', [result.insertId]);
-        })
-        .then(function(result) {
+        return conn.query(
+            'SELECT id, name, description, createdAt, updatedAt FROM subreddits WHERE id = ?', [result.insertId]);
+    })
+    .then(function(result) {
 
-            return result;
-        });
+        return result;
+    });
 
 }
 
@@ -258,13 +258,13 @@ function getAllSubreddits(conn) {
     var promOne = conn.query(queryStr);
 
     return promOne
-        .then(function(result) {
-            return result;
+    .then(function(result) {
+        return result;
 
-        })
-        .catch(function(err) {
-            throw err;
-        })
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
 
 
@@ -272,16 +272,16 @@ function getAllSubreddits(conn) {
 function createOrUpdateVote(vote, conn) {
 
     return conn.query(
-            'INSERT INTO votes SET postId=?, userId=?, vote=? ON DUPLICATE KEY UPDATE vote=?', [vote.postId, vote.userId, vote.vote, vote.vote])
-        .then(function(result) {
-            console.log(result);
-            return conn.query(
-                'SELECT postId, userId, vote, createdAt, updatedAt FROM votes');
-        })
-        .then(function(result) {
+        'INSERT INTO votes SET postId=?, userId=?, vote=? ON DUPLICATE KEY UPDATE vote=?', [vote.postId, vote.userId, vote.vote, vote.vote])
+    .then(function(result) {
+        console.log(result);
+        return conn.query(
+            'SELECT postId, userId, vote, createdAt, updatedAt FROM votes');
+    })
+    .then(function(result) {
 
-            return result;
-        });
+        return result;
+    });
 
 }
 

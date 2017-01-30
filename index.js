@@ -92,7 +92,11 @@ app.get('/calculator/:operation', function(req, res) {
 
 app.get('/posts', function(req, res) {
 
-   res.render('post-list', {posts: posts});
+    redditAPI.getAllPosts({}, connection)
+    .then(function(result) {
+        res.render('post-list', {posts: result});
+    })
+   
 
 });
 

@@ -7,7 +7,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 app.set('view engine', 'pug');
-
+app.use(express.static('static_files'))
 
 var mysql = require('promise-mysql');
 var connection = mysql.createPool({

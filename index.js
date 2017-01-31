@@ -41,7 +41,6 @@ app.get('/calculator/:operation', function(req, res) {
             firstOperand: req.query.num1,
             secondOperand: req.query.num2,
             solution: +req.query.num1 + +req.query.num2
-
         }
 
         res.send(ret);

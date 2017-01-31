@@ -14,7 +14,7 @@ var redditAPI = require('./reddit_promise');
 
 
 // redditAPI.createUser({
-//   username: 'hello67',
+//   username: 'John ',
 //   password: 'xxx'
 // },connection)
 // .then(function(res) {
@@ -28,11 +28,11 @@ var redditAPI = require('./reddit_promise');
 
 
 // redditAPI.createPost({
-//       title: 'hi reddit!',
-//       url: 'https://www.reddit/r/funny/xxxx/x/xxx',
-//       userId: 4 //,
+//       title: 'The Cats Eye Nebula from Hubble',
+//       url: 'https://apod.nasa.gov/apod/image/1701/CatsEye_HubbleVillaVerde_800.jpg',
+//       userId: 1 //,
 //       //subredditId: 1
-//     }, 2, connection)
+//     }, 1, connection)
 // .then(function(res) {
 //     console.log(res);
 //     //connection.end();

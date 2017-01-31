@@ -51,7 +51,17 @@ CREATE TABLE `votes` (
   PRIMARY KEY (userId, postId),
   FOREIGN KEY (`postId`) REFERENCES `subreddits` (`id`),
   FOREIGN KEY (`userId`) REFERENCES `users` (`id`) 
+);  
+
+
+CREATE TABLE `sessions` (
+  `userId` varchar(50) NOT NULL,
+  `token` varchar(60) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL,
+  PRIMARY KEY (userId)
 );        
+
 
 
 

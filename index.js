@@ -4,7 +4,6 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var morgan = require('morgan');
 
-
 var app = express();
 
 // Specify the usage of the Pug template engine
@@ -12,7 +11,9 @@ app.set('view engine', 'pug');
 
 // Middleware
 // This middleware will parse the POST requests coming from an HTML form, and put the result in req.body.  Read the docs for more info!
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 // This middleware will parse the Cookie header from all requests, and put the result in req.cookies.  Read the docs for more info!
 app.use(cookieParser());
@@ -29,15 +30,39 @@ Then, you'll be able to use the API inside your app.get/app.post functions as ap
 */
 var mysql = require('promise-mysql');
 var connection = mysql.createPool({
-    host: process.env.IP,
-    user: process.env.C9_USER,
-    password: '',
-    database: 'reddit',
-    connectionLimit: 10
+  host: process.env.IP,
+  user: process.env.C9_USER,
+  password: '',
+  database: 'reddit',
+  connectionLimit: 10
 });
 
 // load our reddit API 
 var redditAPI = require('./reddit_promise');
+
+// The middleware
+function checkLoginToken(request, response, next) {
+  // check if there's a SESSION cookie...
+  if (request.cookies.SESSION) {
+    redditAPI.getUserFromSession(request.cookies.SESSION, connection)
+    .then(function(user) {
+
+      if (user.length !== 0) {
+        //console.log(user);
+        request.loggedInUser = user;
+      }
+      next();
+
+    })
+  }
+  else {
+    // if no SESSION cookie, move forward
+    next();
+  }
+}
+
+// Adding the middleware to our express stack. This should be AFTER the cookieParser middleware
+app.use(checkLoginToken);
 
 
 // Resources
@@ -48,15 +73,17 @@ app.get('/', function(request, response) {
   */
   redditAPI.getAllPosts({}, connection)
     .then(function(result) {
-        response.render('post-list', {posts: result});
+      response.render('post-list', {
+        posts: result
+      });
     })
 });
 
 app.get('/login', function(request, response) {
   // code to display login form
-  
-  var loginForm = 
-  `<form action="/login" method="POST"> 
+
+  var loginForm =
+    `<form action="/login" method="POST"> 
     <div>
       <input type="text" name="username" placeholder="Enter username">
     </div>
@@ -67,37 +94,37 @@ app.get('/login', function(request, response) {
   </form>`
 
   response.send(loginForm);
-  
-  
+
 });
 
 app.post('/login', function(request, response) {
   // code to login a user
   // hint: you'll have to use response.cookie here
-  
+
   redditAPI.checkLogin(request.body, connection)
     .then(function(result) {
-        if(result === true){
-            return redditAPI.createSession(request.body.username, connection)
-        } 
-        else {
-            throw (new Error('Wrong username or password'));
-        }
+      if (result === true) {
+        return redditAPI.createSession(request.body.username, connection)
+      }
+      else {
+        throw (new Error('Wrong username or password'));
+      }
     })
-    .then(function(result){
-        response.cookie('SESSION', result);
-        response.redirect('/login');
+    .then(function(result) {
+      response.cookie('SESSION', result);
+      response.redirect('/login');
     })
-    .catch(function(err){
+    .catch(function(err) {
       response.status(401).send(err);
     })
 
 });
 
+
 app.get('/signup', function(request, response) {
   // code to display signup form
-  var signupForm = 
-  `<form action="/signup" method="POST"> 
+  var signupForm =
+    `<form action="/signup" method="POST"> 
     <div>
       <input type="text" name="username" placeholder="Enter username">
     </div>
@@ -110,32 +137,86 @@ app.get('/signup', function(request, response) {
   response.send(signupForm);
 });
 
+
 app.post('/signup', function(request, response) {
   // code to signup a user
   // ihnt: you'll have to use bcrypt to hash the user's password
-  
-  console.log(request.body.username);
-  
+
   redditAPI.createUser({
-    username: request.body.username,
-    password: request.body.password
-  },connection)
+      username: request.body.username,
+      password: request.body.password
+    }, connection)
   .then(function(res) {
-      console.log(res);
-      
-      response.redirect('/login');
-      
+    console.log(res);
+    response.redirect('/login');
+
   })
   .catch(function(err) {
-      console.log(err);
-      //connection.end();
+    console.log(err);
+    //connection.end();
   })
-  
+
 });
 
 
+
+app.get('/createPost', function(request, response) {
+  var createPostForm =
+    `<form action="/createPost" method="POST"> 
+    <div>
+      <input type="text" name="url" placeholder="Enter url">
+    </div>
+    <div>
+      <input type="text" name="title" placeholder="Enter title">
+    </div>
+    <button type="submit">Create Post</button>
+  </form>`
+
+  response.send(createPostForm);
+})
+
+
+// And later on in a request handler (this is ***only an example***):
+app.post('/createPost', function(request, response) {
+  // before creating content, check if the user is logged in
+  if (!request.loggedInUser) {
+    // HTTP status code 401 means Unauthorized
+    response.status(401).send('You must be logged in to create content!');
+  }
+  else {
+    //response.send("Successful - createPost page");
+    
+    redditAPI.createPost({
+      title: request.body.title,
+      url: request.body.url,
+      userId: 1
+    },1,connection)
+    .then (function(result){
+      response.redirect(/);
+    })
+  }
+})
+
 app.post('/vote', function(request, response) {
   // code to add an up or down vote for a content+user combination
+});
+
+
+app.get('/vote', function(request, response) {
+  // code to add an up or down vote for a content+user combination
+  
+  var temp = 
+  `<form action="/vote" method="post">
+  <input type="hidden" name="vote" value="1">
+  <input type="hidden" name="postId" value="XXXX">
+  <button type="submit">upvote this</button>
+</form>
+<form action="/vote" method="post">
+  <input type="hidden" name="vote" value="-1">
+  <input type="hidden" name="postId" value="XXXX">
+  <button type="submit">downvote this</button>
+</form>`
+  response.send(temp);
 });
 
 

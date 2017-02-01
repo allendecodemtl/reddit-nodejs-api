@@ -6,30 +6,30 @@ var HASH_ROUNDS = 10;
 function createUser(user, conn) {
 
     return bcrypt.hash(user.password, HASH_ROUNDS)
-        .then(function(hashedPassword) {
+    .then(function(hashedPassword) {
 
-            return conn.query(
-                'INSERT INTO users (username,password, createdAt) VALUES (?, ?, ?)', [user.username, hashedPassword, new Date()]);
+        return conn.query(
+            'INSERT INTO users (username,password, createdAt) VALUES (?, ?, ?)', [user.username, hashedPassword, new Date()]);
 
-        })
-        .then(function(results) {
+    })
+    .then(function(results) {
 
-            return conn.query(
-                'SELECT id, username, createdAt, updatedAt FROM users WHERE id = ?', [results.insertId]);
+        return conn.query(
+            'SELECT id, username, createdAt, updatedAt FROM users WHERE id = ?', [results.insertId]);
 
-        })
-        .then(function(result) {
-            return result;
+    })
+    .then(function(result) {
+        return result;
 
-        })
-        .catch(function(err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-                throw (new Error('A user with this username already exists'));
-            }
-            else {
-                return (err);
-            }
-        });
+    })
+    .catch(function(err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            throw (new Error('A user with this username already exists'));
+        }
+        else {
+            return (err);
+        }
+    });
 }
 
 
@@ -37,15 +37,15 @@ function createPost(post, sub, conn) {
 
     return conn.query(
             'INSERT INTO posts (userId, title, url, createdAt, subredditId) VALUES (?, ?, ?, ?, ?)', [post.userId, post.title, post.url, new Date(), sub])
-        .then(function(result) {
+    .then(function(result) {
 
-            return conn.query(
-                'SELECT id,title,url,userId, createdAt, updatedAt, subredditId FROM posts WHERE id = ?', [result.insertId]);
-        })
-        .then(function(result) {
+        return conn.query(
+            'SELECT id,title,url,userId, createdAt, updatedAt, subredditId FROM posts WHERE id = ?', [result.insertId]);
+    })
+    .then(function(result) {
 
-            return result;
-        })
+        return result;
+    })
 }
 
 
@@ -80,43 +80,43 @@ function getAllPosts(options, conn) {
     var promOne = conn.query(queryStr, [limit, offset]);
 
     return promOne
-        .then(function(result) {
+    .then(function(result) {
 
-            var arrResult = [];
+        var arrResult = [];
 
-            result.forEach(function(item, index) {
+        result.forEach(function(item, index) {
 
-                var temp = {
-                    id: item.postId,
-                    title: item.title,
-                    url: item.url,
-                    createdAt: item.posts_CreatedAt,
-                    updatedAt: item.posts_UpdatedAt,
-                    userId: item.usersId,
-                    user: {
-                        id: item.usersId,
-                        username: item.username,
-                        createdAt: item.users_CreatedAt,
-                        updatedAt: item.users_UpdatedAt
-                    },
-                    subreddit: {
-                        id: item.subredditId,
-                        name: item.name,
-                        description: item.description
-                    }
-
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
+                },
+                subreddit: {
+                    id: item.subredditId,
+                    name: item.name,
+                    description: item.description
                 }
 
-                arrResult.push(temp);
-            })
+            }
 
-
-            return arrResult;
-
+            arrResult.push(temp);
         })
-        .catch(function(err) {
-            throw err;
-        })
+
+
+        return arrResult;
+
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
 
 
@@ -147,34 +147,34 @@ function getAllPostsForUser(userId, options, conn) {
     var promOne = conn.query(queryStr, [userId, limit, offset]);
 
     return promOne
-        .then(function(result) {
+    .then(function(result) {
 
-            //console.log(result);
-            var arrResult = []
+        //console.log(result);
+        var arrResult = []
 
-            result.forEach(function(item, index) {
+        result.forEach(function(item, index) {
 
-                var temp = {
-                    id: item.postId,
-                    title: item.title,
-                    url: item.url,
-                    createdAt: item.posts_CreatedAt,
-                    updatedAt: item.posts_UpdatedAt,
-                    userId: item.usersId,
-                    user: {
-                        id: item.usersId,
-                        username: item.username,
-                        createdAt: item.users_CreatedAt,
-                        updatedAt: item.users_UpdatedAt
-                    }
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
                 }
-                arrResult.push(temp);
-            })
-            return arrResult;
+            }
+            arrResult.push(temp);
         })
-        .catch(function(err) {
-            throw err;
-        })
+        return arrResult;
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
 
 
@@ -201,34 +201,34 @@ function getSinglePost(userId, conn) {
     var promOne = conn.query(queryStr, [userId]);
 
     return promOne
-        .then(function(result) {
+    .then(function(result) {
 
-            //console.log(result);
-            var arrResult = []
+        //console.log(result);
+        var arrResult = []
 
-            result.forEach(function(item, index) {
+        result.forEach(function(item, index) {
 
-                var temp = {
-                    id: item.postId,
-                    title: item.title,
-                    url: item.url,
-                    createdAt: item.posts_CreatedAt,
-                    updatedAt: item.posts_UpdatedAt,
-                    userId: item.usersId,
-                    user: {
-                        id: item.usersId,
-                        username: item.username,
-                        createdAt: item.users_CreatedAt,
-                        updatedAt: item.users_UpdatedAt
-                    }
+            var temp = {
+                id: item.postId,
+                title: item.title,
+                url: item.url,
+                createdAt: item.posts_CreatedAt,
+                updatedAt: item.posts_UpdatedAt,
+                userId: item.usersId,
+                user: {
+                    id: item.usersId,
+                    username: item.username,
+                    createdAt: item.users_CreatedAt,
+                    updatedAt: item.users_UpdatedAt
                 }
-                arrResult.push(temp);
-            })
-            return arrResult;
+            }
+            arrResult.push(temp);
         })
-        .catch(function(err) {
-            throw err;
-        })
+        return arrResult;
+    })
+    .catch(function(err) {
+        throw err;
+    })
 }
 
 
@@ -275,15 +275,15 @@ function createOrUpdateVote(vote, conn) {
 
     return conn.query(
             'INSERT INTO votes SET postId=?, userId=?, vote=? ON DUPLICATE KEY UPDATE vote=?', [vote.postId, vote.userId, vote.vote, vote.vote])
-        .then(function(result) {
-            console.log(result);
-            return conn.query(
-                'SELECT postId, userId, vote, createdAt, updatedAt FROM votes');
-        })
-        .then(function(result) {
+    .then(function(result) {
+        console.log(result);
+        return conn.query(
+            'SELECT postId, userId, vote, createdAt, updatedAt FROM votes');
+    })
+    .then(function(result) {
 
-            return result;
-        });
+        return result;
+    });
 
 }
 
@@ -291,21 +291,21 @@ function createOrUpdateVote(vote, conn) {
 function checkLogin(user, conn) {
 
     return conn.query(
-        'SELECT * FROM users WHERE username = ?', [user.username])
-        .then(function(result) {
-            if (result.length === 0) {
-                return "Error";
-            }
-            else {
-                var userFound = result[0];
-                var actualHashedPassword = userFound.password;
+            'SELECT * FROM users WHERE username = ?', [user.username])
+    .then(function(result) {
+        if (result.length === 0) {
+            return "Error";
+        }
+        else {
+            var userFound = result[0];
+            var actualHashedPassword = userFound.password;
 
-                return bcrypt.compare("" + [user.password], actualHashedPassword)
-            }
-        })
-        .then(function(result) {
-            return result;
-        });
+            return bcrypt.compare("" + [user.password], actualHashedPassword)
+        }
+    })
+    .then(function(result) {
+        return result;
+    });
 
 }
 
@@ -324,6 +324,15 @@ function createSession(userId, conn) {
 }
 
 
+function getUserFromSession(sessionToken, conn) {
+
+    return conn.query('SELECT userId FROM sessions WHERE token = ?', [sessionToken])
+    .then(function(result) {
+        return result;
+    })
+
+}
+
 // Export the API
 module.exports = {
     // ...
@@ -337,6 +346,7 @@ module.exports = {
     createOrUpdateVote: createOrUpdateVote,
     checkLogin: checkLogin,
     createSession: createSession,
-    createSessionToken: createSessionToken
+    createSessionToken: createSessionToken,
+    getUserFromSession: getUserFromSession
 
 };

@@ -56,7 +56,7 @@ CREATE TABLE `votes` (
 
 CREATE TABLE `sessions` (
   `userId` varchar(50) NOT NULL,
-  `token` varchar(60) NOT NULL,
+  `token` varchar(1000) NOT NULL,
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL,
   PRIMARY KEY (userId)

@@ -49,6 +49,7 @@ function createPost(post, sub, conn) {
 }
 
 
+
 function getAllPosts(options, conn) {
 
     var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
@@ -67,12 +68,30 @@ function getAllPosts(options, conn) {
         users.updatedAt as users_UpdatedAt,
         subreddits.id as subredditId,
         subreddits.name,
-        subreddits.description
+        subreddits.description,
+        SUM(IFNULL(votes.vote,0)) as Score,
+        SUM(IF(IFNULL(votes.vote,0) = 1, 1, 0)) as Upvotes,
+        SUM(IF(IFNULL(votes.vote,0) = -1, 1, 0)) as Downvotes
         FROM posts 
         LEFT JOIN users 
         ON posts.userid = users.id
         LEFT JOIN subreddits
         ON posts.subredditId = subreddits.id
+        LEFT JOIN votes
+        ON posts.id = votes.postId
+        GROUP BY posts.id,
+        posts.title,
+        posts.url,
+        posts.createdAt,
+        posts.updatedAt,
+        users.id,
+        users.username,
+        users.password,
+        users.createdAt,
+        users.updatedAt,
+        subreddits.id,
+        subreddits.name,
+        subreddits.description
         ORDER BY posts.createdAt DESC
         LIMIT ? OFFSET ?
     `;
@@ -92,6 +111,9 @@ function getAllPosts(options, conn) {
                 url: item.url,
                 createdAt: item.posts_CreatedAt,
                 updatedAt: item.posts_UpdatedAt,
+                score: item.Score,
+                upVotes: item.Upvotes,
+                downVotes: item.Downvotes,
                 userId: item.usersId,
                 user: {
                     id: item.usersId,
@@ -315,9 +337,12 @@ function createSessionToken() {
 }
 
 
-function createSession(userId, conn) {
+function createSession(username, conn) {
     var token = createSessionToken();
-    return conn.query('INSERT INTO sessions SET userId = ?, token = ?', [userId, token])
+    return conn.query('SELECT id FROM users WHERE username = ?', [username])
+    .then(function(result){
+        return conn.query('INSERT INTO sessions SET userId = ?, token = ?', [result[0].id, token])
+    })
     .then(function(result) {
         return token;
     });

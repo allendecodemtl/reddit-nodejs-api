@@ -1,1 +1,23 @@
-testing
+body {
+    margin: 24px;
+    border: 10px solid white;
+    background-color: black;
+}
+
+h1 {
+    font-size: 24px;
+    
+    text-decoration: underline
+}
+
+a {
+    color: pink;
+}
+
+h2 {
+    color: yellow;
+}
+
+p {
+    color: white;
+}

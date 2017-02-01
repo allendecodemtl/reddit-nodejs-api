@@ -21,6 +21,8 @@ app.use(cookieParser());
 // This middleware will console.log every request to your web server! Read the docs for more info!
 app.use(morgan('dev'));
 
+app.use(express.static('static_files'))
+
 /*
 IMPORTANT!!!!!!!!!!!!!!!!!
 
@@ -44,6 +46,7 @@ var redditAPI = require('./reddit_promise');
 function checkLoginToken(request, response, next) {
   // check if there's a SESSION cookie...
   if (request.cookies.SESSION) {
+    
     redditAPI.getUserFromSession(request.cookies.SESSION, connection)
     .then(function(user) {
 
@@ -112,7 +115,7 @@ app.post('/login', function(request, response) {
     })
     .then(function(result) {
       response.cookie('SESSION', result);
-      response.redirect('/login');
+      response.redirect('/');
     })
     .catch(function(err) {
       response.status(401).send(err);
@@ -124,15 +127,16 @@ app.post('/login', function(request, response) {
 app.get('/signup', function(request, response) {
   // code to display signup form
   var signupForm =
-    `<form action="/signup" method="POST"> 
-    <div>
-      <input type="text" name="username" placeholder="Enter username">
-    </div>
-    <div>
-      <input type="password" name="password" placeholder="Enter password">
-    </div>
-    <button type="submit">Sign up</button>
-  </form>`
+    `<h2>Signup Form</h2>
+      <form action="/signup" method="POST"> 
+        <div>
+          <input type="text" name="username" placeholder="Enter username">
+        </div>
+        <div>
+          <input type="password" name="password" placeholder="Enter password">
+        </div>
+        <button type="submit">Sign up</button>
+      </form>`
 
   response.send(signupForm);
 });
@@ -162,15 +166,16 @@ app.post('/signup', function(request, response) {
 
 app.get('/createPost', function(request, response) {
   var createPostForm =
-    `<form action="/createPost" method="POST"> 
-    <div>
-      <input type="text" name="url" placeholder="Enter url">
-    </div>
-    <div>
-      <input type="text" name="title" placeholder="Enter title">
-    </div>
-    <button type="submit">Create Post</button>
-  </form>`
+    `<h2>Create Post</h2>
+    <form action="/createPost" method="POST"> 
+      <div>
+        <input type="text" name="url" placeholder="Enter url">
+      </div>
+      <div>
+        <input type="text" name="title" placeholder="Enter title">
+      </div>
+      <button type="submit">Create Post</button>
+    </form>`
 
   response.send(createPostForm);
 })
@@ -184,21 +189,37 @@ app.post('/createPost', function(request, response) {
     response.status(401).send('You must be logged in to create content!');
   }
   else {
-    //response.send("Successful - createPost page");
     
-    redditAPI.createPost({
+   redditAPI.createPost({
       title: request.body.title,
       url: request.body.url,
-      userId: 1
+      userId: request.loggedInUser[0].userId
     },1,connection)
     .then (function(result){
-      response.redirect(/);
+      response.redirect('/');
     })
   }
 })
 
+
 app.post('/vote', function(request, response) {
   // code to add an up or down vote for a content+user combination
+  
+  if (!request.loggedInUser) {
+    // HTTP status code 401 means Unauthorized
+    response.status(401).send('You must be logged in to vote!');
+  }
+  else {
+  
+    redditAPI.createOrUpdateVote({
+      postId: request.body.postId,
+      vote: request.body.vote,
+      userId: request.loggedInUser[0].userId
+    }, connection)
+    .then(function(result) {
+      response.redirect('/');
+    })
+  }
 });
 
 
@@ -207,15 +228,15 @@ app.get('/vote', function(request, response) {
   
   var temp = 
   `<form action="/vote" method="post">
-  <input type="hidden" name="vote" value="1">
-  <input type="hidden" name="postId" value="XXXX">
-  <button type="submit">upvote this</button>
-</form>
-<form action="/vote" method="post">
-  <input type="hidden" name="vote" value="-1">
-  <input type="hidden" name="postId" value="XXXX">
-  <button type="submit">downvote this</button>
-</form>`
+      <input type="hidden" name="vote" value="1">
+      <input type="hidden" name="postId" value="XXXX">
+      <button type="submit">upvote this</button>
+    </form>
+    <form action="/vote" method="post">
+      <input type="hidden" name="vote" value="-1">
+      <input type="hidden" name="postId" value="XXXX">
+      <button type="submit">downvote this</button>
+    </form>`
   response.send(temp);
 });
 

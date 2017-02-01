@@ -49,7 +49,7 @@ CREATE TABLE `votes` (
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL,
   PRIMARY KEY (userId, postId),
-  FOREIGN KEY (`postId`) REFERENCES `subreddits` (`id`),
+  FOREIGN KEY (`postId`) REFERENCES `posts` (`id`),
   FOREIGN KEY (`userId`) REFERENCES `users` (`id`) 
 );  
 
@@ -66,3 +66,7 @@ CREATE TABLE `sessions` (
 
 
 
+
+
+       
+      
